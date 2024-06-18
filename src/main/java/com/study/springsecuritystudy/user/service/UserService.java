@@ -1,26 +1,35 @@
 package com.study.springsecuritystudy.user.service;
 
+import com.study.springsecuritystudy.security.JwtUtil;
+import com.study.springsecuritystudy.user.dto.InfoResponseDto;
 import com.study.springsecuritystudy.user.dto.LoginRequestDto;
 import com.study.springsecuritystudy.user.dto.LoginResponseDto;
 import com.study.springsecuritystudy.user.dto.SingnupRequestDto;
 import com.study.springsecuritystudy.user.entity.User;
 import com.study.springsecuritystudy.user.entity.UserRoleEnum;
 import com.study.springsecuritystudy.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class UserService {
 
+    final JwtUtil jwtUtil;
+
+    @Autowired
     final UserRepository userRepository;
     //이거 빈에서 그냥 주는건가?
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(JwtUtil jwtUtil, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -63,5 +72,32 @@ public class UserService {
         }
 
         return new LoginResponseDto(user.getUsername(), user.getRole(), user.getInfo());
+    }
+
+    public InfoResponseDto readInfo(HttpServletRequest req) {
+        String tokenValue = jwtUtil.getTokenFromRequest(req);
+
+        System.out.println("토큰 값 : " + tokenValue);
+
+        if (StringUtils.hasText(tokenValue)) {
+            tokenValue = jwtUtil.substringToken(tokenValue);
+            System.out.println("잘라낸 토큰 값 : " + tokenValue);
+
+
+            if (!jwtUtil.validateToken(tokenValue)) {
+                throw new IllegalArgumentException("Token Error");
+
+            }
+
+            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+
+            System.out.println("jwt 내부 값" + info);
+
+        }
+
+        Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+
+        InfoResponseDto responseDto = new InfoResponseDto(info.getSubject(), info.get("info"));
+         return  responseDto;
     }
 }
