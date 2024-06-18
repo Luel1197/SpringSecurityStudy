@@ -1,6 +1,7 @@
 package com.study.springsecuritystudy.user.service;
 
 import com.study.springsecuritystudy.user.dto.LoginRequestDto;
+import com.study.springsecuritystudy.user.dto.LoginResponseDto;
 import com.study.springsecuritystudy.user.dto.SingnupRequestDto;
 import com.study.springsecuritystudy.user.entity.User;
 import com.study.springsecuritystudy.user.entity.UserRoleEnum;
@@ -49,7 +50,18 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public  login(LoginRequestDto requestDto) {
+    public LoginResponseDto login(LoginRequestDto requestDto) {
+        String username = requestDto.getUsername();
+        String password = requestDto.getPassword();
 
+        //아이디 확인
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("등록된 사용자가 없습니다"));
+
+        //비번확인
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return new LoginResponseDto(user.getUsername(), user.getRole(), user.getInfo());
     }
 }

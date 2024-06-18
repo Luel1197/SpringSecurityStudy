@@ -45,6 +45,7 @@ public class JwtUtil {
         return Jwts.builder()
                         .setSubject(username)
                         .claim(AUTHORIZATION_KEY, role)
+                        .claim("info", info)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)

@@ -2,6 +2,7 @@ package com.study.springsecuritystudy.user.controller;
 
 import com.study.springsecuritystudy.security.JwtUtil;
 import com.study.springsecuritystudy.user.dto.LoginRequestDto;
+import com.study.springsecuritystudy.user.dto.LoginResponseDto;
 import com.study.springsecuritystudy.user.dto.SingnupRequestDto;
 import com.study.springsecuritystudy.user.entity.UserRoleEnum;
 import com.study.springsecuritystudy.user.service.UserService;
@@ -40,8 +41,8 @@ public class UserController {
     //로그인 (Post /login) JWT x
     @PostMapping("/login")
     public ResponseEntity<String> signup(@RequestBody LoginRequestDto requestDto) {
-        userService.login(requestDto);
-        return new ResponseEntity<>(jwtUtil.createToken(username, role),HttpStatus.OK);
+        LoginResponseDto responseDto = userService.login(requestDto);
+        return new ResponseEntity<>(jwtUtil.createToken(responseDto.getUsername(), responseDto.getRole(), responseDto.getInfo()),HttpStatus.OK);
     }
 
     //JWT를 이용한 UserName 반환 GET 만들기 (GET /user/info) -> JWT O
