@@ -7,6 +7,7 @@ import com.study.springsecuritystudy.security.UserDetailsServiceImpl;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -51,6 +52,8 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/api/jwt").permitAll()
+                        .requestMatchers( HttpMethod.POST,"/api/user").permitAll()
+                        .requestMatchers( HttpMethod.POST,"/api/login").permitAll()
                         .anyRequest().authenticated()
         );
 

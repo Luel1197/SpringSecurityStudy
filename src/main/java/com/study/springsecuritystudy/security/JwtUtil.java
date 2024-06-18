@@ -39,7 +39,7 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(String username, UserRoleEnum role) {
+    public String createToken(String username, UserRoleEnum role, String info) {
         Date date = new Date();
 
         return Jwts.builder()
